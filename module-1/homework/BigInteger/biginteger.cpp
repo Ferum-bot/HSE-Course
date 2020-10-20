@@ -1,7 +1,7 @@
 #include "biginteger.h"
 
-int BigInteger::size() const {
-    return (int)this->original_number.size() - 1;
+size_t BigInteger::size() const {
+    return this->original_number.size() - 1;
 }
 
 bool BigInteger::sign() const {
@@ -56,6 +56,10 @@ void BigInteger::push_front(char value) {
 }
 
 char& BigInteger::operator [] (int index) {
+    return this->original_number[index];
+}
+
+char BigInteger::operator [] (int index) const {
     return this->original_number[index];
 }
 
@@ -116,15 +120,15 @@ BigInteger& BigInteger::operator = (int value) {
     return (*this);
 }
 
-bool BigInteger::operator == (BigInteger& value) {
+bool BigInteger::operator == (const BigInteger& value) {
     if (this->sign() != value.sign()) {
         return false;
     }
     if (this->size() != value.size()) {
         return false;
     }
-    int n = this->size();
-    for (int i = 1; i <= n; i++) {
+    size_t n = this->size();
+    for (size_t i = 1; i <= n; i++) {
         if ((*this)[i] != value[i]) {
             return false;
         }
@@ -132,11 +136,11 @@ bool BigInteger::operator == (BigInteger& value) {
     return true;
 }
 
-bool BigInteger::operator != (BigInteger& value) {
+bool BigInteger::operator != (const BigInteger& value) {
     return !((*this) == value);
 }
 
-bool BigInteger::operator > (BigInteger& value) {
+bool BigInteger::operator > (const BigInteger& value) {
     if (*this == value) {
         return false;
     }
@@ -153,8 +157,8 @@ bool BigInteger::operator > (BigInteger& value) {
         if (this->size() < value.size()) {
             return false;
         }
-        int n = this->size();
-        for (int i = n; i > 0; i--) {
+        size_t n = this->size();
+        for (size_t i = n; i > 0; i--) {
             if ((*this)[i] == value[i]) {
                 continue;
             }
@@ -171,8 +175,8 @@ bool BigInteger::operator > (BigInteger& value) {
     if (this->size() < value.size()) {
         return true;
     }
-    int n = this->size();
-    for (int i = n; i > 0; i--) {
+    size_t n = this->size();
+    for (size_t i = n; i > 0; i--) {
         if ((*this)[i] == value[i]) {
             continue;
         }
@@ -184,123 +188,127 @@ bool BigInteger::operator > (BigInteger& value) {
     return false;
 }
 
-bool BigInteger::operator >= (BigInteger& value) {
+bool BigInteger::operator >= (const BigInteger& value) {
     return (*this) == value || (*this) > value;
 }
 
-bool BigInteger::operator < (BigInteger& value) {
+bool BigInteger::operator < (const BigInteger& value) {
     return !((*this) >= value);
 }
 
-bool BigInteger::operator <= (BigInteger& value) {
+bool BigInteger::operator <= (const BigInteger& value) {
     return !((*this) > value);
 }
 
 BigInteger BigInteger::operator + (const BigInteger& value) {
-    BigInteger left = *this;
-    BigInteger right = value;
-    if (left.sign() && right.sign()) {
-        return addition(left, right);
-    }
-    if (!left.sign() && !right.sign()) {
-        return addition(left, right);
-    }
-    if (left.sign() && !right.sign()) {
-        right[0] = '+';
-        return subtraction(left, right);
-    }
-    left[0] = '+';
-    return subtraction(right, left);
+    BigInteger tmp = (*this);
+    tmp += value;
+    return tmp;
 }
 
 BigInteger BigInteger::operator - (const BigInteger& value) {
-    BigInteger left = *this;
-    BigInteger right = value;
-    if (left.sign() && right.sign()) {
-        return subtraction(left, right);
-    }
-    if (left.sign() && !right.sign()) {
-        right[0] = '+';
-        return addition(left, right);
-    }
-    if (!left.sign() && right.sign()) {
-        right[0] = '-';
-        return addition(left, right);
-    }
-    right[0] = '+';
-    left[0] = '+';
-    return subtraction(right, left);
+    BigInteger tmp = *this;
+    tmp -= value;
+    return tmp;
 }
 
 BigInteger BigInteger::operator * (const BigInteger& value) {
-    BigInteger left = (*this);
-    BigInteger right = value;
-    bool sign1 = left.sign();
-    bool sign2 = right.sign();
-    left[0] = '+';
-    right[0] = '+';
-    BigInteger res = multiplication(left, right);
-    if (sign1 != sign2) {
-        res[0] = '-';
-    }
-    cleaning_value_from_zero(res);
-    return res;
+    BigInteger tmp = *this;
+    tmp *= value;
+    return tmp;
 }
 
 BigInteger BigInteger::operator / (const BigInteger& value) {
-    BigInteger left = (*this);
-    BigInteger right = value;
-    bool sign1 = left.sign();
-    bool sign2 = right.sign();
-    left[0] = '+';
-    right[0] = '+';
-    BigInteger res = division(left, right);
-    if (sign1 != sign2) {
-        res[0] = '-';
-    }
-    cleaning_value_from_zero(res);
-    return res;
+    BigInteger tmp = (*this);
+    tmp /= value;
+    return tmp;
 }
 
 BigInteger BigInteger::operator % (const BigInteger& value) {
-    return (*this) - (*this) / value * value;
+    BigInteger tmp = (*this);
+    tmp %= value;
+    return tmp;
 }
 
 BigInteger& BigInteger::operator += (const BigInteger& value) {
-    (*this) = (*this) + value;
+    if (this->sign() && value.sign()) {
+        (*this) = addition(*this, value, 1);
+        return (*this);
+    }
+    if (!this->sign() && !value.sign()) {
+        (*this) = addition(*this, value, 0);
+        return (*this);
+    } 
+    if (this->sign() && !value.sign()) {
+        (*this) = subtraction(*this, value);
+        return (*this);
+    }
+    (*this) = subtraction(value, *this);
     return (*this);
 }
 
 BigInteger& BigInteger::operator -= (const BigInteger& value) {
-    (*this) = (*this) - value;
+    if (this->sign() && value.sign()) {
+        (*this) = subtraction(*this, value);
+        return (*this);
+    }
+    if (!this->sign() && !value.sign()) {
+        (*this) = subtraction(value, *this);
+        return (*this);
+    } 
+    if (this->sign() && !value.sign()) {
+        (*this) = addition(*this, value, 1);
+        return (*this);
+    }
+    (*this) = addition(*this, value, 0);
     return (*this);
 }
 
 BigInteger& BigInteger::operator *= (const BigInteger& value) {
-    (*this) = (*this) * value;
+    BigInteger left = (*this);
+    BigInteger right = value;
+    bool sign1 = left.sign();
+    bool sign2 = right.sign();
+    left[0] = '+';
+    right[0] = '+';
+    *this = multiplication(left, right);
+    if (sign1 != sign2) {
+        (*this)[0] = '-';
+    }
+    cleaning_value_from_zero(*this);
     return (*this);
 }
 
 BigInteger& BigInteger::operator /= (const BigInteger& value) {
-    (*this) = (*this) / value;
-    return (*this);
+    BigInteger left = (*this);
+    BigInteger right = value;
+    bool sign1 = left.sign();
+    bool sign2 = right.sign();
+    left[0] = '+';
+    right[0] = '+';
+    (*this) = division(left, right);
+    if (sign1 != sign2) {
+        (*this)[0] = '-';
+    }
+    cleaning_value_from_zero(*this);
+    return *this;
 }
 
 BigInteger& BigInteger::operator %= (const BigInteger& value) {
-    (*this) = (*this) % value;
+    (*this) = (*this) - (*this) / value * value;
     return (*this);
 }
 
 BigInteger& BigInteger::operator --() {
     if (this->sign()) {
-        int n = this->size();
+        size_t n = this->size();
         BigInteger tmp = 0;
         if ((*this) == tmp) {
             (*this) = -1;
             return *this;
         }
-        int st = 1;
-        for (int i = 1; i <= n; i++) {
+        size_t st = 1;
+        for (size_t i = 1; i <= n; i++) {
             if ((*this)[i] == '0') {
                 continue;
             }
@@ -313,14 +321,14 @@ BigInteger& BigInteger::operator --() {
         else {
             (*this)[st]--;
         }
-        for (int i = st - 1; i > 0; i--) {
+        for (size_t i = st - 1; i > 0; i--) {
             (*this)[i] = '9';
         }
         return (*this);
     }
-    int n = this->size();
+    size_t n = this->size();
     int st = -1;
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         if ((*this)[i] == '9') {
             continue;
         }
@@ -334,7 +342,7 @@ BigInteger& BigInteger::operator --() {
     else {
         (*this)[st]++;
     }
-    for (int i = st - 1; i > 0; i--) {
+    for (size_t i = st - 1; i > 0; i--) {
         (*this)[i] = '0';
     }
     return *this;
@@ -342,9 +350,9 @@ BigInteger& BigInteger::operator --() {
 
 BigInteger& BigInteger::operator ++() {
     if (this->sign()) {
-        int n = this->size();
+        size_t n = this->size();
         int st = -1;
-        for (int i = 1; i <= n; i++) {
+        for (size_t i = 1; i <= n; i++) {
             if ((*this)[i] == '9') {
                 continue;
             }
@@ -358,19 +366,19 @@ BigInteger& BigInteger::operator ++() {
         else {
             (*this)[st]++;
         }
-        for (int i = st - 1; i > 0; i--) {
+        for (size_t i = st - 1; i > 0; i--) {
             (*this)[i] = '0';
         }
         return (*this);
     }
-    int n = this->size();
+    size_t n = this->size();
     BigInteger value = -1;
     if ((*this) == value) {
         (*this) = 0;
         return (*this);
     }
-    int st = 1;
-    for (int i = 1; i <= n; i++) {
+    size_t st = 1;
+    for (size_t i = 1; i <= n; i++) {
         if ((*this)[i] == '0') {
             continue;
         }
@@ -381,7 +389,7 @@ BigInteger& BigInteger::operator ++() {
     if ((*this)[st] == '0' && st == n) {
         this->pop_back();
     }
-    for (int i = st - 1; i > 0; i--) {
+    for (size_t i = st - 1; i > 0; i--) {
         (*this)[i] = '9';
     }
     return (*this);
@@ -423,8 +431,8 @@ std::string BigInteger::toString() {
     if (!this->sign()) {
         res = "-";
     }
-    int n = this->size();
-    for (int i = n; i > 0; i--) {
+    size_t n = this->size();
+    for (size_t i = n; i > 0; i--) {
         res += (*this)[i];
     }
     return res;
@@ -443,7 +451,8 @@ std::ostream& operator << (std::ostream& out, const BigInteger& value) {
     return out;
 }
 
-int get_digit(BigInteger& num, int index) {
+
+int get_digit(const BigInteger& num, size_t index) {
     if (num.size() < index) {
         return 0;
     }
@@ -451,15 +460,15 @@ int get_digit(BigInteger& num, int index) {
     return digit;
 }
 
-BigInteger addition(BigInteger& left_value, BigInteger& right_value) {
+BigInteger addition(const BigInteger& left_value, const BigInteger& right_value, const bool sign_result) {
     BigInteger res = 0;
     res.pop_back();
-    if (!left_value.sign()) {
+    if (!sign_result) {
         res[0] = '-';
     }
-    int n = left_value.size() > right_value.size() ? left_value.size() : right_value.size();
+    size_t n = left_value.size() > right_value.size() ? left_value.size() : right_value.size();
     int add = 0;
-    for (int i = 1; i <= n; i++) {
+    for (size_t i = 1; i <= n; i++) {
         int left_digit = get_digit(left_value, i);
         int right_digit = get_digit(right_value, i);
         int sum = left_digit + right_digit + add;
@@ -472,10 +481,10 @@ BigInteger addition(BigInteger& left_value, BigInteger& right_value) {
     return res;
 }
 
-void recalc(BigInteger& num, int index) {
-    int n = num.size();
-    int st = index + 1;
-    for (int i = index + 1; i <= n; i++) {
+void recalc(BigInteger& num, size_t index) {
+    size_t n = num.size();
+    size_t st = index + 1;
+    for (size_t i = index + 1; i <= n; i++) {
         if (num[i] == '0') {
             continue;
         }
@@ -483,13 +492,14 @@ void recalc(BigInteger& num, int index) {
         st = i;
         break;
     }
-    for (int i = index + 1; i < st; i++) {
+    for (size_t i = index + 1; i < st; i++) {
         num[i] = '9';
     }
     return;
 }
 
-BigInteger subtraction(BigInteger& left_value, BigInteger& right_value) {
+BigInteger subtraction(const BigInteger& left_valuee, const BigInteger& right_value) {
+    BigInteger left_value = left_valuee;
     if (left_value == right_value) {
         BigInteger res = 0;
         return res;
@@ -501,8 +511,8 @@ BigInteger subtraction(BigInteger& left_value, BigInteger& right_value) {
     }
     BigInteger res = 0;
     res.pop_back();
-    int n = right_value.size() > left_value.size() ? right_value.size() : left_value.size();
-    for (int i = 1; i <= n; i++) {
+    size_t n = right_value.size() > left_value.size() ? right_value.size() : left_value.size();
+    for (size_t i = 1; i <= n; i++) {
         int left_digit = get_digit(left_value, i);
         int right_digit = get_digit(right_value, i);
         if (left_digit >= right_digit) {
@@ -519,29 +529,29 @@ BigInteger subtraction(BigInteger& left_value, BigInteger& right_value) {
     return res;
 }
 
-void prepare_for_mp(BigInteger& value, int size) {
-    int n = value.size();
-    for (int i = n; i < size; i++) {
+void prepare_for_mp(BigInteger& value, size_t size) {
+    size_t n = value.size();
+    for (size_t i = n; i < size; i++) {
         value.push_back(0);
     }
     return;
 }
 
 std::pair<BigInteger, BigInteger> cut_value_for_mp(BigInteger& value) {
-    int n = value.size();
+    size_t n = value.size();
     BigInteger left = 0, right = 0;
     left.pop_back(), right.pop_back();
-    for (int i = 1; i <= (n / 2); i++) {
+    for (size_t i = 1; i <= (n / 2); i++) {
         right.push_back(value[i]);
     }
-    for (int i = (n / 2) + 1; i <= n; i++) {
+    for (size_t i = (n / 2) + 1; i <= n; i++) {
         left.push_back(value[i]);
     }
     return {left, right};
 }
 
 void cleaning_value_from_zero(BigInteger& value) {
-    int n = value.size();
+    size_t n = value.size();
     while (n > 1 && value[n] == '0') {
         value.pop_back();
         n--;
@@ -555,8 +565,8 @@ void adding_zero_to_the_begining(BigInteger& value, int kol) {
     for (int i = 0; i < kol; i++) {
         res.push_back(0);
     }
-    int n = value.size();
-    for (int i = 1; i <= n; i++) {
+    size_t n = value.size();
+    for (size_t i = 1; i <= n; i++) {
         res.push_back(value[i]);
     }
     value = res;
@@ -564,28 +574,32 @@ void adding_zero_to_the_begining(BigInteger& value, int kol) {
 }
 
 BigInteger multiplication(BigInteger& left_value, BigInteger& right_value) {
-    int sz1 = left_value.size();
-    int sz2 = right_value.size();
+    size_t sz1 = left_value.size();
+    size_t sz2 = right_value.size();
     if (sz1 == sz2 && sz1 == 1) {
         int val1 = left_value[1] - '0';
         int val2 = right_value[1] - '0';
         BigInteger res_val = val1 * val2;
         return res_val;
     }
-    int sz = sz1 >= sz2 ? sz1 : sz2;
+    size_t sz = sz1 >= sz2 ? sz1 : sz2;
     if (sz % 2 != 0) {
         sz++;
     }
+    // Делаем, чтобы длины чисел были равны
     prepare_for_mp(left_value, sz);
     prepare_for_mp(right_value, sz);
+    // Разрезаем на два числа равной длинны
     std::pair<BigInteger, BigInteger> pr1 = cut_value_for_mp(left_value);
     std::pair<BigInteger, BigInteger> pr2 = cut_value_for_mp(right_value);
     BigInteger l_f_num = pr1.first;
     BigInteger r_f_num = pr1.second;
     BigInteger l_s_num = pr2.first;
     BigInteger r_s_num = pr2.second;
+    // Перемножаем соответсвующие части
     BigInteger val1 = multiplication(l_f_num, l_s_num);
 	BigInteger val2 = multiplication(r_f_num, r_s_num);
+    // Убираем ведущие нули
     cleaning_value_from_zero(l_f_num);
     cleaning_value_from_zero(r_f_num);
     cleaning_value_from_zero(l_s_num);
@@ -598,6 +612,7 @@ BigInteger multiplication(BigInteger& left_value, BigInteger& right_value) {
     cleaning_value_from_zero(val3);
     BigInteger val4 = val3 - val2 - val1;
     cleaning_value_from_zero(val4);
+    // Добавляем разряды в число
     adding_zero_to_the_begining(val1, sz);
     adding_zero_to_the_begining(val4, sz / 2);
     return (val1 + val4 + val2);
@@ -611,8 +626,8 @@ BigInteger division(BigInteger& left_value, BigInteger& right_value) {
     BigInteger cur_value = 0;
     res.pop_back();
     cur_value.pop_back();
-    int n = right_value.size() - 1;
-    int pos = left_value.size();
+    size_t n = right_value.size() - 1;
+    size_t pos = left_value.size();
     while (n != 0) {
         cur_value.push_front(left_value[pos]);
         pos--;
