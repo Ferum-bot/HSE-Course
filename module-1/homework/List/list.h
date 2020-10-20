@@ -33,8 +33,9 @@ namespace task {
         list(const list& other);
 
         ~list();
-        list& operator=(const list& other);
+        list& operator = (const list& other);
 
+        bool operator == (const list& other) const;
 
         int& front();
         const int& front() const;

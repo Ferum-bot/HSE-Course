@@ -27,12 +27,12 @@ namespace task {
 	}
 
 	list::list(const list& other) {
-		int n = static_cast<int>(other.size());
+		size_t n = other.size();
 		this->sz = n;
 		Node* curr = other.head;
 		this->head = new Node;
 		this->tail = this->head;
-		for (int i = 0; i < n; i++) {
+		for (size_t i = 0; i < n; i++) {
 			if (this->empty()) {
 				Node* new_node = new Node(curr->value);
 				new_node->next_node = this->tail;
@@ -55,7 +55,7 @@ namespace task {
 		this->sz = count;
 		this->head = new Node;
 		this->tail = this->head;
-		for (int i = 0; i < static_cast<int>(count); i++) {
+		for (size_t i = 0; i < count; i++) {
 			if (this->empty()) {
 				Node* node_to_add = new Node(value);
 				node_to_add->next_node = this->tail;
@@ -83,6 +83,9 @@ namespace task {
 	}
 
 	list& list::operator = (const list& other) {
+		if ((*this) == other) {
+			return (*this);
+		}
 		this->clear();
 		int n = static_cast<int>(other.size());
 		if (n == 0) {
@@ -106,6 +109,23 @@ namespace task {
 			this->tail->prev_node = node_to_add;
 		}
 		return (*this);
+	}
+
+	bool list::operator == (const list& other) const {
+		if (this->size() != other.size()) {
+			return false;
+		}
+		size_t n = this->size();
+		Node* left_node_to_check = this->head;
+		Node* right_node_to_check = other.head;
+		for (size_t i = 0; i < n; i++) {
+			if (left_node_to_check->value != right_node_to_check->value) {
+				return false;
+			}
+			left_node_to_check = left_node_to_check->next_node;
+			right_node_to_check = right_node_to_check->next_node;
+		}
+		return true;
 	}
 
 	int& list::front() {
@@ -211,15 +231,15 @@ namespace task {
 
 	void list::resize(size_t count) {
 		if (this->size() <= count) {
-			int n = static_cast<int>(count - this->size());
-			for (int i = 0; i < n; i++) {
+			size_t n = count - this->size();
+			for (size_t i = 0; i < n; i++) {
 				this->push_back(0);
 			}
 			return;
 		}
 		else {
-			int n = static_cast<int>(this->size() - count);
-			for (int i = 0; i < n; i++) {
+			size_t n = this->size() - count;
+			for (size_t i = 0; i < n; i++) {
 				this->pop_back();
 			}
 			return;
@@ -231,9 +251,9 @@ namespace task {
 			return 0;
 		}
 		int res = 0;
-		int n = static_cast<int>(this->size());
+		size_t n = this->size();
 		Node* curr = this->head;
-		for (int i = 0; i < n; i++) {
+		for (size_t i = 0; i < n; i++) {
 			if (curr->value == value) {
 				res++;
 			}
@@ -248,7 +268,7 @@ namespace task {
 		Node* node_right_head = other.head;
 		Node* node_right_tail = other.tail;
 
-		int dust_sz = this->sz;
+		size_t dust_sz = this->sz;
 		this->sz = other.sz;
 		other.sz = dust_sz;
 
@@ -264,9 +284,9 @@ namespace task {
 		if (!this->count(value)) {
 			return;
 		}
-		int n = static_cast<int>(this->size());
+		size_t n = this->size();
 		Node* curr_node = this->head;
-		for (int i = 0; i < n; i++) {
+		for (size_t i = 0; i < n; i++) {
 			if (curr_node->value != tmp) {
 				curr_node = curr_node->next_node;
 				continue;
@@ -291,7 +311,6 @@ namespace task {
 		if (this->empty()) {
 			return;
 		}
-		int n = static_cast<int>(this->size());
 		Node* curr_node = this->head;
 		Node* curr_node_next = curr_node->next_node;
 		while (curr_node_next != this->tail) {
@@ -316,8 +335,8 @@ namespace task {
 		if (this->empty() || this->size() == 1) {
 			return;
 		}
-		int n = static_cast<int>(this->size());
-		for (int i = 0; i < n; i++) {
+		size_t n = this->size();
+		for (size_t i = 0; i < n; i++) {
 			Node* curr_node = this->head;
 			Node* curr_next_node = this->head->next_node;
 			while (curr_next_node != this->tail) {
