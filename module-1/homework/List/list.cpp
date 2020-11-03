@@ -83,7 +83,7 @@ namespace task {
 	}
 
 	list& list::operator = (const list& other) {
-		if ((*this) == other) {
+		if (this == &other) {
 			return (*this);
 		}
 		this->clear();
