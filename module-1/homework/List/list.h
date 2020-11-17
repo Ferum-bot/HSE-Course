@@ -4,48 +4,71 @@
 
 namespace task {
 
+    class list {
+    private:
 
-class list {
+        class Node {
+        public:
 
-public:
+            Node* next_node;
+            Node* prev_node;
 
-    list();
-    list(size_t count, const int& value = int());
+            int value;
 
-    ~list();
-    list& operator=(const list& other);
+        public:
+
+            Node();
+            Node(const int& value, Node* next = nullptr, Node* prev = nullptr);
+
+            Node(const Node& node);
+
+            ~Node();
+
+        };
+
+    public:
+
+        list();
+        list(size_t count, const int& value = int());
+        list(const list& other);
+
+        ~list();
+        list& operator = (const list& other);
+
+        bool operator == (const list& other) const;
+
+        int& front();
+        const int& front() const;
+
+        int& back();
+        const int& back() const;
 
 
-    int& front();
-    const int& front() const;
-
-    int& back();
-    const int& back() const;
+        bool empty() const;
+        size_t size() const;
+        void clear();
 
 
-    bool empty() const;
-    size_t size() const;
-    void clear();
+        void push_back(const int& value);
+        void pop_back();
+        void push_front(const int& value);
+        void pop_front();
+        void resize(size_t count);
+        void swap(list& other);
 
 
-    void push_back(const int& value);
-    void pop_back();
-    void push_front(const int& value);
-    void pop_front();
-    void resize(size_t count);
-    void swap(list& other);
+        void remove(const int& value);
+        void unique();
+        void sort();
 
+    private:
 
-    void remove(const int& value);
-    void unique();
-    void sort();
+        Node* head;
+        Node* tail;
 
-    // Your code goes here?..
-
-private:
-
-    // Your code goes here...
-
-};
+        size_t sz;
+        
+        int count(const int& value) const;
+    };
 
 }  // namespace task
