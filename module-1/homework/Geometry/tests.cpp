@@ -260,7 +260,7 @@ TEST(Ellipse, Area) {
     ASSERT_NEAR(ellipse.area(), area, 1e-6);
 }
 
-int main(int argc, char** argv) {
+signed main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
