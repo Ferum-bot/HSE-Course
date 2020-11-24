@@ -80,7 +80,8 @@ bool Ellipse::isCongruentTo(const Shape& another) const {
     if (current == nullptr) {
         return false;
     }
-    return Point::isEqual(a, current->a) && Point::isEqual(b, current->b) && Point::isEqual(c, current->c);
+    return Point::isEqual(a, current->a) && Point::isEqual(b, current->b) 
+                && Point::isEqual(c, current->c);
 }
 
 bool Ellipse::isSimilarTo(const Shape& another) const {
@@ -126,4 +127,3 @@ void Ellipse::scale(const Point& center, const long double& coefficient) {
     firstFocus = Point(center.getX() + v1.getX(), center.getY() + v1.getY());
     secondFocus = Point(center.getX() + v2.getX(), center.getY() + v2.getY());
 }
-

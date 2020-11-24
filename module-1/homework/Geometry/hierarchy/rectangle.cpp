@@ -51,7 +51,8 @@ bool Rectangle::isCongruentTo(const Shape& another) const {
         if (Polygon::isPropotional(sidesOfFirstPolygon, sidesOfSecondPolygon) &&
             Polygon::isAglesEqual(sidesOfFirstPolygon, sidesOfSecondPolygon)) {
             
-            long double value = Polygon::getPropotionalCoefficient(sidesOfFirstPolygon, sidesOfSecondPolygon);
+            long double value = Polygon::getPropotionalCoefficient(sidesOfFirstPolygon, 
+                                                                    sidesOfSecondPolygon);
             if (Point::isEqual(value, 1)) {
                  return true;
             }

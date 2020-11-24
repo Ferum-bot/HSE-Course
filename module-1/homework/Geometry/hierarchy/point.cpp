@@ -54,8 +54,10 @@ bool Point::leftIsAboveRight(const long double& left, const long double& right) 
 
 void Point::rotate(const Point& center, const long double& angleDegrees) {
     const long double angle = Point::convertToRadians(angleDegrees);
-    const long double newX = (x - center.getX()) * cos(angle) - (y - center.getY()) * sin(angle) + center.getX();
-    const long double newY = (x - center.getX()) * sin(angle) + (y - center.getY()) * cos(angle) + center.getY();
+    const long double newX = (x - center.getX()) * cos(angle) 
+                    - (y - center.getY()) * sin(angle) + center.getX();
+    const long double newY = (x - center.getX()) * sin(angle) 
+                    + (y - center.getY()) * cos(angle) + center.getY();
     x = newX;
     y = newY;
 }
@@ -70,4 +72,16 @@ void Point::reflex(const Point& center) {
 
 long double Point::convertToRadians(const long double& angle) {
     return (angle * Point::PI) / 180;
+}
+
+Point Point::getMedianPoint(const Point& first, const Point& second) {
+    const long double x = (first.getX() + second.getX()) / 2;
+    const long double y = (first.getY() + second.getY())  / 2;
+    return Point(x, y);
+}
+
+Point operator + (const Point& left, const Point& right) {
+    const long double x = left.getX() + right.getX();
+    const long double y = left.getY() + right.getY();
+    return Point(x, y);
 }

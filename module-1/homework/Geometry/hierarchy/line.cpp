@@ -125,7 +125,8 @@ long double Line::getAngleFromLine(const Line& line) const {
     if (!this->intersectsWithLine(line)) {
         return 0;
     }
-    long double value = (a * line.a + b * line.b) / (sqrt(a * a + b * b) * sqrt(line.a * line.a + line.b * line.b));
+    long double value = (a * line.a + b * line.b) / 
+        (sqrt(a * a + b * b) * sqrt(line.a * line.a + line.b * line.b));
     return acos(value);
 }
 

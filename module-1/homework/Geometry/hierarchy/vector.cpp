@@ -48,7 +48,8 @@ long double Vector::crossProduct(const Vector& first, const Vector& second) {
     return first.getX() * second.getY() - first.getY() * second.getX();
 }
 
-std::pair<Vector, Vector> Vector::getTwoVectorsFromPoints(const Point& first, const Point& second, const Point& third) {
+std::pair<Vector, Vector> Vector::getTwoVectorsFromPoints(const Point& first, 
+                                        const Point& second, const Point& third) {
     return {Vector(first, second), Vector(second, third)};
 }
 

@@ -4,7 +4,8 @@ Circle::Circle(const Circle& circle) = default;
 
 Circle::~Circle() = default;
 
-Circle::Circle(const Point& center, const long double& radius): Ellipse(center, center, 2 * radius){
+Circle::Circle(const Point& center, const long double& radius) 
+                :Ellipse(center, center, 2 * radius){
     this->center = center;
     this->radius = radius;
 }

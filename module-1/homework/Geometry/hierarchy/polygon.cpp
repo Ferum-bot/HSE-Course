@@ -30,7 +30,8 @@ bool Polygon::isConvex() const {
     size_t size = vertices.size();
     int type = -1;
     for (size_t i = 0; i < size; i++) {
-        std::pair<Vector, Vector> resultVectors = Vector::getTwoVectorsFromPoints(vertices[i], vertices[(i + 1) % size], vertices[(i + 2) % size]);
+        std::pair<Vector, Vector> resultVectors = Vector::getTwoVectorsFromPoints(vertices[i], 
+                                vertices[(i + 1) % size], vertices[(i + 2) % size]);
         const Vector& v1 = resultVectors.first;
         const Vector& v2 = resultVectors.second;
         const long double resultOfCrossProduct = Vector::crossProduct(v1, v2);
@@ -112,7 +113,8 @@ bool Polygon::isCongruentTo(const Shape& another) const {
         if (Polygon::isPropotional(sidesOfFirstPolygon, sidesOfSecondPolygon) &&
             Polygon::isAglesEqual(sidesOfFirstPolygon, sidesOfSecondPolygon)) {
             
-            long double value = Polygon::getPropotionalCoefficient(sidesOfFirstPolygon, sidesOfSecondPolygon);
+            long double value = Polygon::getPropotionalCoefficient(sidesOfFirstPolygon, 
+                                                                    sidesOfSecondPolygon);
             if (Point::isEqual(value, 1)) {
                  return true;
             }
@@ -238,7 +240,8 @@ bool Polygon::operator != (const Shape& another) const {
     return !(*this == another);
 }
 
-bool Polygon::isPropotional(const std::vector<Segment>& first, const std::vector<Segment>& second) {
+bool Polygon::isPropotional(const std::vector<Segment>& first, 
+                            const std::vector<Segment>& second) {
     size_t size = first.size();
     const long double value = first[0].getLength() / second[0].getLength();
     for (size_t i = 0; i < size; i++) {
@@ -251,7 +254,8 @@ bool Polygon::isPropotional(const std::vector<Segment>& first, const std::vector
     return true;
 }
 
-bool Polygon::isAglesEqual(const std::vector<Segment>& first, const std::vector<Segment>& second) {
+bool Polygon::isAglesEqual(const std::vector<Segment>& first, 
+                            const std::vector<Segment>& second) {
     size_t size = first.size();
     for (size_t i = 0; i < size; i++) {
         Vector firstVectorFromFirst = first[i].getVector();
@@ -287,7 +291,8 @@ void Polygon::moveBy(const long double& deltaX, const long double& deltaY) {
     return;
 }
 
-long double Polygon::getPropotionalCoefficient(const std::vector<Segment>& first, const std::vector<Segment>& second) {
+long double Polygon::getPropotionalCoefficient(const std::vector<Segment>& first, 
+                                                const std::vector<Segment>& second) {
     return first[0].getLength() / second[0].getLength();
 }
 

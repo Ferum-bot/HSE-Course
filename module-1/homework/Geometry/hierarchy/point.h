@@ -32,6 +32,8 @@ public:
     friend bool operator == (const Point& left, const Point& right);
     friend bool operator != (const Point& left, const Point& right);
 
+    friend Point operator + (const Point& left, const Point& right);
+
 public:
 
     static long double getDist(const Point& first, const Point& second);
@@ -42,5 +44,6 @@ public:
 
     static long double convertToRadians(const long double& angle);
 
-};
+    static Point getMedianPoint(const Point& first, const Point& second);
 
+};
