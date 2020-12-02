@@ -36,3 +36,14 @@ add_executable(runner tests.cpp)
 target_link_libraries(runner LINK_PUBLIC typelist gtest_main)
 
 add_test(NAME runner_test COMMAND runner)
+
+target_compile_features(runner PUBLIC cxx_std_20)
+target_compile_options(runner PUBLIC -Wall -Wextra -Wshadow -Wconversion)
+
+option(ENABLE_SANITIZERS OFF)
+if(ENABLE_SANITIZERS)
+  add_library(sanitizers INTERFACE)
+  target_compile_options(sanitizers INTERFACE -fsanitize=address,undefined,leak)
+  target_link_options(sanitizers INTERFACE -fsanitize=address,undefined,leak)
+  target_link_libraries(runner PUBLIC sanitizers)
+endif()
